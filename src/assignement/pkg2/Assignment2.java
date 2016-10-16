@@ -42,9 +42,9 @@ public class Assignment2 {
 	}
 
 	public static void inOrder() {
-
-                    current = root;
-                //start all the way on the left leaf
+                //We start at Root
+                current = root;
+                //Move all the way on the left leaf
 		while (current.lBit == 1) {
 
 			current = current.left;
@@ -61,11 +61,11 @@ public class Assignment2 {
 	}
 
 	public static Node nextInOrder(Node next) {
-		//if no right child go to next right
+                //this basically outputs either right or left
+		//if no right child move up to next right
 		if(next.rBit == 0){
 			
-			return next.right;
-			
+			return next.right;	
 		}
 		
 		next = next.right;
@@ -128,7 +128,7 @@ public class Assignment2 {
 			}
 
 			if (NewChildtoLeft) {
-                            //creating a new child cell to a new parent
+                            //creating a new child node to a virgin parent
                             //here creating a new left node so parent lbit=1 and parent rbit=0
 
 				node.lBit = current.lBit;
@@ -139,7 +139,8 @@ public class Assignment2 {
 				node.right = current;
 
 			} else if (NewChildtoRight) {
-
+                            //creating a new child node to a virgin parent
+                            //here creating a new left node so parent lbit=0 and parent rbit=1
 				node.rBit = current.rBit;
 				node.right = current.right;
 				current.right = node;
