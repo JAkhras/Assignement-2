@@ -6,35 +6,37 @@ package assignement.pkg2;
 public class Assignment2 {
 
 	static Node root;
-	static Node current;
+	static Node Previous;
 	static boolean NewChildtoRight = false;
 	static boolean NewChildtoLeft = false;
 
 	public static void main(String[] args) {
-
-		
-                //initialize Root
+                
+                //The main function consists of 3 steps
+              
+                //1) Initialize Root with a synthetic "Mother" Root of value=10000
 		root = new Node(10000);
-		root.lBit = 0;
-		root.rBit = 0;
-		root.left = root.right = root;
+		root.LeftChild = 0;
+		root.RightChild = 0;
+		root.L = root.R = root;
             
 		
-                //First we generate the tree
+                //2) Generate the tree
+                //createNode is a function bellow that automatically generates an ordered BST
 		createNode(45);
 		createNode(78);
 		createNode(89);
 		createNode(32);
-		createNode(60);
+		createNode(60);             
 		createNode(25);
 		createNode(39);                
 		createNode(91);
 		createNode(12);
 		createNode(34);
 		createNode(65);
-		              
+               
 		
-
+                //3) Print the tree in "inOrder" sequence
 		System.out.println("Output for inOrder");
 		inOrder();
 		System.out.println();
@@ -42,40 +44,45 @@ public class Assignment2 {
 	}
 
 	public static void inOrder() {
-                //We start at Root
-                current = root;
-                //Move all the way on the left leaf
-		while (current.lBit == 1) {
+                //We start at "Mother" Root of value=10000
+                Previous = root;
+                //Move all the way on the left leaf first
+		while (Previous.LeftChild == 1) {
 
-			current = current.left;
+			Previous = Previous.L;
 
 		}
-		//then move to next based on inOrder
-		while(current != root){
-			
-			System.out.print(" -> " + current.data);
-			current = nextInOrder(current);
-			
+		//Whilellop() runs until last node refers to "Mother" node
+		while(Previous != root){
+			//First print value retrived all the way on the left
+			System.out.print(" -> " + Previous.data);
+                        //Then go fetch the next data and repeat print
+			Previous = nextInOrder(Previous);
+			//That's it!!The end!
 		}
 
 	}
 
 	public static Node nextInOrder(Node next) {
-                //this basically outputs either right or left
-		//if no right child move up to next right
-		if(next.rBit == 0){
-			
-			return next.right;	
+              
+		//The order is crucial here
+                //First look right
+                //Then Look left
+                //Gives priority to LeftChild over RightChild
+                
+                //We look right first
+		if(next.RightChild == 0){
+			//if node has no right child, go to next right node
+			return next.R;	
 		}
+		//If node has a right child, temporarily assign a next destination as right node
+		next = next.R;
 		
-		next = next.right;
-		
-		while(next.lBit == 1){
-			
-			next = next.left;
-			
+                //if node also has a left node then go to next left node
+		while(next.LeftChild == 1){	
+			next = next.L;
 		}
-		
+		//otherwise use the temporary destination
 		return next;
 		
 	}
@@ -83,18 +90,18 @@ public class Assignment2 {
 
 	public static void createNode(int data) {
 
-		Node node = new Node(data);
+		Node Actual = new Node(data);
 
 		
-
-			current = root;
+                        //Always start with the "Mother" Root of value=10000
+			Previous = root;
 
 			while (true) {
                                 //if value of data is smaller than value of Root
-				if (node.data < current.data) {
+				if (Actual.data < Previous.data) {
 
-					if (current.lBit == 0) {
-                                            //if there is nothing on the left, create a new left node
+					if (Previous.LeftChild == 0) {
+                                            //if there is nothing on the left, create a new left extension
 
 						NewChildtoLeft = true;
 						NewChildtoRight = false;
@@ -102,15 +109,15 @@ public class Assignment2 {
 
 					} else {
 
-						current = current.left;
-                                                //if there is something on the left go down to left
+						Previous = Previous.L;
+                                                //if there is something on the left move down one node to left
 
 					}
 
 				} else {
-                                        //if node data > current data
-					if (current.rBit == 0) {
-                                            //if there is nothing to the right create a right
+                                        //if Actual data > Previous data
+					if (Previous.RightChild == 0) {
+                                            //if there is nothing to the right create a new right extension
 
 						NewChildtoLeft = false;
 						NewChildtoRight = true;
@@ -118,8 +125,8 @@ public class Assignment2 {
 
 					} else {
 
-						current = current.right;
-                                                //if there is something on the right go down to right
+						Previous = Previous.R;
+                                                //if there is something on the right move one node to right
 
 					}
 
@@ -128,29 +135,38 @@ public class Assignment2 {
 			}
 
 			if (NewChildtoLeft) {
-                            //creating a new child node to a virgin parent
-                            //here creating a new left node so parent lbit=1 and parent rbit=0
-
-				node.lBit = current.lBit;
-				node.left = current.left;
-				current.left = node;
-				current.lBit = 1;
-				node.rBit = 0;
-				node.right = current;
+                           //creating a new left child node to a virgin parent
+                            
+                                //The new child inherits next left from its parent
+                                Actual.L = Previous.L;
+                                //New child can refer to its parent
+                                Actual.R = Previous;
+                                //The parent node is then given its "parent" title/parameters
+				Previous.L = Actual;
+				Previous.LeftChild = 1;
+                                //New Child gets initialized
+                                Actual.LeftChild = 0;
+				Actual.RightChild = 0;
+				
 
 			} else if (NewChildtoRight) {
-                            //creating a new child node to a virgin parent
-                            //here creating a new left node so parent lbit=0 and parent rbit=1
-				node.rBit = current.rBit;
-				node.right = current.right;
-				current.right = node;
-				current.rBit = 1;
-				node.lBit = 0;
-				node.left = current;
+                           //creating a new right child node to a virgin parent
+                           
+                                //The new child inherits next right from its parent
+				Actual.R = Previous.R;
+                                //New child can refer to its parent
+                                Actual.L = Previous;
+                                //The parent node is then given its "parent" title/parameters
+				Previous.R = Actual;
+				Previous.RightChild = 1;
+                                //New Child gets initialized
+                                Actual.RightChild = 0;
+				Actual.LeftChild = 0;
+				
 
 			} else {
 
-				System.out.println("Problem");
+				System.out.println("Not Normal");
 
 			}
 		
@@ -158,20 +174,3 @@ public class Assignment2 {
 
 }
 
-class Node {
-        //node constructor
-	int data;
-
-	Node left;
-	Node right;
-
-	int lBit;
-	int rBit;
-
-	Node(int data) {
-
-		this.data = data;
-
-	}
-
-}
